@@ -38,6 +38,7 @@
 defun suma
     push {r4-r11,lr}
     // Insertar código a continuación
+
     ADD R0,R1
 
     // Retorno, antes R0 debe tener el valor correcto
@@ -61,6 +62,34 @@ defun sumatoria
     push {r4-r11,lr}
     // Insertar código a continuación
 
+// Declaro las variables contador y acumulador
+
+    MOV R2,#0 //Acumulador parte baja = 0
+    MOV R3,#0 // Acumulador parte alta = 0
+    MOV R4,#0 //Indice = 0
+
+0:
+    CMP R4,R0 //Coparo R3 con R0 (o i con n)
+    BGE 1f // Si R3 >= R0, salto a la etiqueta 1
+    LDR R5,[R1,R4,LSL #2]  //Cargo en R5 el valor en la posicion "R1 + indice*4" (Cada elemento pesa 4 bits)
+    CMP R5,#0
+    BLT menor
+    B mayor
+menor:
+    MOV R6,#0xFFFFFFFF
+    B 2f
+mayor:
+    MOV R6,#0x00000000
+    // R3:R2 = R3:R2  + R6:R5   
+2:
+    ADDS R2,R5 //Sumo el acumuador parte baja
+    ADC R3,R6
+    ADD R4,#1 //Sumo 1 al indice
+    B 0b //Retorno a la etiqueta 0 mas cercana hacia arriba
+1:
+    //Saltar a la etiqueta 1 significa salir del bucle
+    MOV R0,R2
+    MOV R1,R3
     // Retorno, antes R1:R0 debe tener el valor correcto
     pop {r4-r11,pc}
 endfun sumatoria
@@ -81,6 +110,32 @@ endfun sumatoria
 defun posicion_maximo
     push {r4-r11,lr}
     // Insertar código a continuación
+
+ /*   MOV R2,#0 //k
+
+    CMP R0,#1  // Comparo el valor de R0 con 1
+    BLE 5f // Si R0<=1, salto a la etiqueta 5
+
+    LDR R3,[R1,R2] // M = b[k]
+    MOV R4,#1 // i = 1
+
+    //Segundo Bucle
+3:
+    CMP R4,R0 //Comparo i con n
+    BGE 5f // Si i>=n, salto a la etiqueta 5
+
+    //If then
+    LDR R5,[R1,R4]
+    CMP R3 //Comparo M con b[i]
+    BGE 4f // Si M>=b[i], salto a la etiqueta 4
+
+    MOV R3,R1[R4] // M = b[i]
+    MOV R2,R4 // k = i
+4: 
+
+    ADDC R4,#1 //i = i+1
+5:
+    //La etiqueta 5 representa salir del bucle */
 
     // Retorno, antes R0 debe tener el valor correcto
     pop {r4-r11,pc}
