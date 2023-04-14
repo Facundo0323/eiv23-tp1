@@ -69,17 +69,15 @@ defun sumatoria
     MOV R4,#0 //Indice = 0
 
 0:
-    CMP R4,R0 //Coparo R3 con R0 (o i con n)
-    BGE 1f // Si R3 >= R0, salto a la etiqueta 1, de lo contrario continua el codigo
+    CMP R4,R0 //Comparo R4 con R0 (o i con n)
+    BGE 1f // Si R4 >= R0, salto a la etiqueta 1
     LDR R5,[R1,R4,LSL #2]  //Cargo en R5 (parte baja) el valor en la posicion "R1 + indice*4" (Desplazarse "4" equivale a pasar al siguiente elemento)
     CMP R5,#0 //Comparo el número cargado con 0
     BLT menor
-    B mayor
+    MOV R6,#0x00000000 //Si el numero es mayor o igual a cero, la parte alta sera "0" (signo positivo)
 menor:
-    MOV R6,#0xFFFFFFFF //Si el numero es menor a cero, los 32 bits de la parte alta seran "1" (signo negativo)
-    B 2f
-mayor:
-    MOV R6,#0x00000000   //Si el numero es mayor o igual a cero, la parte alta seran "0" (signo positivo)
+    MOV R6,#0xFFFFFFFF //Si el numero es menor a cero, los 32 bits de la parte alta sera "1" (signo negativo)
+    B 2f 
     // R3:R2 = R3:R2  + R6:R5   
 2:
     ADDS R2,R5 //Sumo el acumuador parte baja
@@ -87,7 +85,7 @@ mayor:
     ADD R4,#1 //Sumo 1 al indice
     B 0b //Retorno a la etiqueta 0 mas cercana hacia arriba
 1:
-    //Saltar a la etiqueta 1 significa salir del bucle
+    //Saltar a la etiqueta 1 equivale a salir del bucle
     //Al terminar muevo los resultados a R1 como parte alta, y R0 como parte baja
     MOV R0,R2 
     MOV R1,R3
@@ -135,11 +133,11 @@ defun posicion_maximo
 1: 
 
     ADD R4,#1 //i = i+1
-    B 0b //Retorno a la etiqueta 0 mas cercana hacia arriba
+    B 0b //Retorno a la etiqueta 0 mas cercana hacia atras
 2:
-    //La etiqueta 2 representa salir del bucle 
+    //La etiqueta 2 equivale a salir del bucle 
 
-    MOV R0,R2 //Copio en R0 la posición actual
+    MOV R0,R2 //Copio en R0 la posición obtenida
 
     // Retorno, antes R0 debe tener el valor correcto
     pop {r4-r11,pc}
@@ -166,20 +164,20 @@ defun ordenar_en_sitio_menor_a_mayor
     push {r4-r11,lr}
     // Insertar código a continuación
     SUB R5,R0,#1 // R5 = k = n-1 (Variable local)
-    MOV R4,R1 // R4 = R1 (Variable local)
+    MOV R4,R1 // R4 = R1 = b (Variable local)
 0:
     CMP R5,#0 // Comparo k con 0 
     BLE 1f // Si k<=0, salto a la etiqueta 1 
 
     ADD R0,R5,#1 // R0 = k+1, cargo el valor necesario antes del salto
-    MOV R1,R4 // R1 = R4, cargo el valor necesario antes del salto
+    MOV R1,R4 // R1 = b, cargo el valor necesario antes del salto
     BL posicion_maximo //Llamo a posicion_maximo (Ahora R0 = j)
     /*Como R1 no almacena ningun resultado, puede usarse para almacenar
     variables temporales*/
     LDR R1,[R4,R5,LSL #2] // Cargo en R1 (x) el valor en la posicion "R4+R5*4" (b[k])
     LDR R6,[R4,R0,LSL #2] // Cargo en R6 el valor en la posición "R4+R0*4" (b[j])
     STR R6,[R4,R5,LSL #2] // Guardo b[j] en la posición "R4+R5*4" (b[k])
-    STR R1,[R4,R0,LSL #2] // Guardo R6 (x) en la posición "R4+R0*4" (b[j])
+    STR R1,[R4,R0,LSL #2] // Guardo R1 (x) en la posición "R4+R0*4" (b[j])
     SUB R5,#1             // k = k-1
     B 0b                  // Salto a la etiqueta 0
 
