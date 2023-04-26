@@ -71,19 +71,26 @@ defun sumatoria
 0:
     CMP R4,R0 //Comparo R4 con R0 (o i con n)
     BGE 1f // Si R4 >= R0, salto a la etiqueta 1
+    
     LDR R5,[R1,R4,LSL #2]  //Cargo en R5 (parte baja) el valor en la posicion "R1 + indice*4" (Desplazarse "4" equivale a pasar al siguiente elemento)
-    CMP R5,#0 //Comparo el número cargado con 0
-    BLT menor
-    MOV R6,#0x00000000 //Si el numero es mayor o igual a cero, la parte alta sera "0" (signo positivo)
+    CMP R5,#0 //Comparo el número cargado con 0    
+    BLT menor //Si el R5<0 salta a la etiqueta menor
+    B mayor //Si el R5>=0 salta a la etiqueta mayor
+
 menor:
-    MOV R6,#0xFFFFFFFF //Si el numero es menor a cero, los 32 bits de la parte alta sera "1" (signo negativo)
+    MOV R6,#0xFFFFFFFF //Si el numero es menor a cero, los 32 bits de la parte alta seran "1" (signo negativo)
     B 2f 
-    // R3:R2 = R3:R2  + R6:R5   
+    // R3:R2 = R3:R2  + R6:R5  
+ 
+mayor:
+    MOV R6,#0x00000000 //Si el numero es mayor o igual a cero, los 32 bits de la parte alta seran "0" (signo positivo)  
+
 2:
     ADDS R2,R5 //Sumo el acumuador parte baja
     ADC R3,R6 //Sumo las partes altas
     ADD R4,#1 //Sumo 1 al indice
     B 0b //Retorno a la etiqueta 0 mas cercana hacia arriba
+    
 1:
     //Saltar a la etiqueta 1 equivale a salir del bucle
     //Al terminar muevo los resultados a R1 como parte alta, y R0 como parte baja
